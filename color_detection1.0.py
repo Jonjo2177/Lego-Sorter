@@ -10,8 +10,13 @@ while True:
     b,g,r = cv.split(frame)
 
     blue_channel = cv.merge([b, g*0, r*0])
+    green_channel = cv.merge([b*0, g, r*0])
+    red_channel = cv.merge([b*0, g*0, r])
 
-    cv.imshow('Blue_Color_Detection', blue_channel)
+
+
+    cv.imshow('Gray_Blue_Color_Detection', blue_channel)
+    cv.imshow('Blue_Color_Detection', b)
     cv.imshow('Blue_Test', frame)
 
     if cv.waitKey(20) & 0xFF==ord('d'):
