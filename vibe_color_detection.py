@@ -1,0 +1,51 @@
+import cv2
+import numpy as np
+
+cap = cv2.VideoCapture('Blue Piece.mov')  # 0 = default webcam
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    # --- Color Ranges ---
+    lower_red1 = np.array([0, 120, 70])
+    upper_red1 = np.array([10, 255, 255])
+    lower_red2 = np.array([170, 120, 70])
+    upper_red2 = np.array([180, 255, 255])
+    lower_blue = np.array([100, 150, 50])
+    upper_blue = np.array([140, 255, 255])
+    lower_green = np.array([35, 40, 40])
+    upper_green = np.array([85, 255, 255])
+
+    # --- Masks ---
+    mask_red = cv2.bitwise_or(cv2.inRange(hsv, lower_red1, upper_red1),
+                              cv2.inRange(hsv, lower_red2, upper_red2))
+    mask_blue = cv2.inRange(hsv, lower_blue, upper_blue)
+    mask_green = cv2.inRange(hsv, lower_green, upper_green)
+
+    # --- Detection Function ---
+    def detect_and_label(mask, color_name, draw_color):
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        for cnt in contours:
+            area = cv2.contourArea(cnt)
+            if area > 500:
+                x, y, w, h = cv2.boundingRect(cnt)
+                cv2.rectangle(frame, (x, y), (x+w, y+h), draw_color, 2)
+                cv2.putText(frame, color_name, (x, y-10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, draw_color, 2)
+
+    # --- Detect Each Color ---
+    detect_and_label(mask_red, "Red", (0, 0, 255))
+    detect_and_label(mask_blue, "Blue", (255, 0, 0))
+    detect_and_label(mask_green, "Green", (0, 255, 0))
+
+    # --- Show Windows ---
+    cv2.imshow("Detected Colors", frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()

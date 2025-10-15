@@ -49,7 +49,7 @@ def contour_features(cnt):
 
 # ---------- Main ----------
 def main():
-    cap = cv2.VideoCapture('Blue.MOV')  # Use 0 for default webcam; on Pi might be 0 or 1
+    cap = cv2.VideoCapture('Green Piece.MOV')  # Use 0 for default webcam; on Pi might be 0 or 1
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
@@ -64,27 +64,43 @@ def main():
         frame_blur = cv2.GaussianBlur(frame, (5,5), 0)
         hsv = cv2.cvtColor(frame_blur, cv2.COLOR_BGR2HSV)
 
-        # Read tuner
+        # Read tuner (figure out how to remove this)
         (H_min,S_min,V_min,H_max,S_max,V_max,
-         MinArea,MaxArea,OpenK,CloseK,C1,C2) = read_hsv_panel()
+        MinArea,MaxArea,OpenK,CloseK,C1,C2) = read_hsv_panel()
+        
+        #Upper and Lower HSV values for RGB
+        lower_green = np.array([35, 40, 40])
+        upper_green = np.array([85, 255, 255])
+
+        lower_blue = np.array([100, 150, 50])
+        upper_blue = np.array([140, 255, 255])
+
+        lower_red2 = np.array([170, 120, 70])
+        upper_red2 = np.array([180, 255, 255])
+
 
         # Color mask (one range). If pieces vary widely in color, run multiple ranges and OR them.
-        mask = cv2.inRange(hsv, (H_min,S_min,V_min), (H_max,S_max,V_max))
+        mask1 = cv2.inRange(hsv, lower_green, upper_green)
+        mask2 = cv2.inRange(hsv, lower_blue, upper_blue)
+        mask3 = cv2.inRange(hsv, lower_red2, upper_red2)
+
 
         # Morphology to clean up
-        kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(OpenK,OpenK))
-        kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(CloseK,CloseK))
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel_open)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel_close)
+        # kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(OpenK,OpenK))
+        # kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(CloseK,CloseK))
+        # mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel_open)
+        # mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel_close)
 
-        # Optional: edge hint for splitting touching bricks
-        edges = cv2.Canny(frame_blur, C1, C2)
-        edges = cv2.dilate(edges, None, iterations=1)
-        # Combine edges with mask to suppress background edges
-        mask_edges = cv2.bitwise_and(mask, mask, mask=cv2.bitwise_not(edges))
+        # # Optional: edge hint for splitting touching bricks
+        # edges = cv2.Canny(frame_blur, C1, C2)
+        # edges = cv2.dilate(edges, None, iterations=1)
+        # # Combine edges with mask to suppress background edges
+        # mask_edges = cv2.bitwise_and(mask, mask, mask=cv2.bitwise_not(edges))
 
         # Contours
-        cnts, _ = cv2.findContours(mask_edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cnts1, _ = cv2.findContours(mask1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) #mask_edges
+        cnts2, _ = cv2.findContours(mask2, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) #mask_edges
+        cnts3, _ = cv2.findContours(mask3, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) #mask_edges
 
         out = frame.copy()
         count = 0
@@ -96,7 +112,7 @@ def main():
             # Heuristic examples (tune for your bricks/top-down view)
             # - Plates/tiles tend to be flatter (higher extent), long bricks have high aspect
             # - Use these to bucket pieces broadly; refine later
-            label = "LEGO"
+            label = "Green LEGO"
             if f["aspect"] > 2.2:
                 label = "long piece"
             if f["solidity"] < 0.85:

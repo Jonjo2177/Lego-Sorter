@@ -19,36 +19,22 @@ void setup() {
   pinMode(IN4, OUTPUT);
   pinMode(ENB, OUTPUT);
   pinMode(ARM, OUTPUT);
-
+  pinMode(LED_BUILTIN,OUTPUT);
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
-    //1st belt begins rotating
-    digitalWrite(IN1, HIGH);
-    digitalWrite(IN2, LOW);
-    analogWrite(ENA, 100); // Speed: 0–255
-    //2nd belt rotates
-    digitalWrite(IN3, HIGH);
-    digitalWrite(IN4, LOW);
-    analogWrite(ENB, 100); // Speed: 0–255
+        // Rotate forward off 1st belt
+      digitalWrite(IN1, HIGH);
+      digitalWrite(IN2, LOW);
+      analogWrite(ENA, 100); // Speed: 0–255
+      //2nd belt rotates
+      digitalWrite(IN3, HIGH);
+      digitalWrite(IN4, HIGH);
+      analogWrite(ENB, 100); // Speed: 0–255
 
-    //----stops for scanning----
-    delay(1000); 
-
-    digitalWrite(IN1, LOW);
-    digitalWrite(IN2, LOW);
-    analogWrite(ENA, 100); // Speed: 0–255
-    //2nd belt rotates
-    digitalWrite(IN3, LOW);
-    digitalWrite(IN4, LOW);
-    analogWrite(ENB, 100); // Speed: 0–255
-
-    delay(3000); 
-
-/*
 //Checks if there is data from python script
   if(Serial.available() > 0){
     String msg = Serial.readString(); //puts data into string 
@@ -62,6 +48,7 @@ void loop() {
       digitalWrite(LED_BUILTIN,LOW);
       delay(100);
       }
+
       //Sets Arms to BLUE BIN
         digitalWrite(ARM, 30);
 
@@ -71,13 +58,13 @@ void loop() {
       analogWrite(ENA, 100); // Speed: 0–255
       //2nd belt rotates
       digitalWrite(IN3, HIGH);
-      digitalWrite(IN4, LOW);
+      digitalWrite(IN4, HIGH);
       analogWrite(ENB, 100); // Speed: 0–255
 
     } 
 
     else if(msg == "Green"){
-      for(int i = 0; i < 2; i++){
+      for(int i = 0; i < 3; i++){
       digitalWrite(LED_BUILTIN,HIGH);
       delay(100);
       digitalWrite(LED_BUILTIN,LOW);
@@ -97,12 +84,13 @@ void loop() {
     }
     
     else if (msg == "Red"){
-      for(int i = 0; i < 3; i++){
+      for(int i = 0; i < 4; i++){
       digitalWrite(LED_BUILTIN,HIGH);
       delay(100);
       digitalWrite(LED_BUILTIN,LOW);
       delay(100);
       }
+      
       //Sets Arms to BLUE BIN
       digitalWrite(ARM, 30);
 
@@ -135,6 +123,6 @@ void loop() {
       digitalWrite(IN4, LOW);
       analogWrite(ENB, 100); // Speed: 0–255
     }
-  }*/
+  }
 
 }
