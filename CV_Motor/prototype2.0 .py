@@ -57,7 +57,7 @@ while True:
     mask_green = cv2.inRange(hsv, lower_green, upper_green)
 
     # --- Detection Function ---
-    def detect_and_label(mask, color_name, draw_color, serialInst, last_color, x):
+    def detect_and_label(mask, color_name, draw_color, serialInst, last_color):
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         for cnt in contours:
             area = cv2.contourArea(cnt)
@@ -67,34 +67,26 @@ while True:
                 cv2.putText(frame, color_name, (x, y-10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, draw_color, 2)
 
-            if last_color != color_name & x < 1:
-                x = 1
-                print(x)
+            if last_color != color_name:
                 serialInst.write((color_name + "\n").encode('utf-8'))
-                print('color_name:', color_name)
+                #print('color_name:', color_name)
                 last_color = color_name
-                print('func_last_color:', last_color)
-                x = x + 1
-                print(x)
-                return last_color
+                #print('func_last_color:', last_color)
 
-            elif x == 1:
-                x = 0
                 return last_color
 
     # --- Detect Each Color ---
 
     last_color = None
-    counter = 0
-    print('1_last_color:', last_color)
-    last_color = detect_and_label( mask_red, "Red", (0,0,255), serialInst, last_color, counter)
-    print('R_last_color:', last_color)
+    #print('1_last_color:', last_color)
+    last_color = detect_and_label( mask_red, "Red", (0,0,255), serialInst, last_color)
+    #print('R_last_color:', last_color)
 
-    last_color = detect_and_label( mask_blue, "Blue", (255,0,0), serialInst, last_color, counter)
-    print('B_last_color:', last_color)
+    last_color = detect_and_label( mask_blue, "Blue", (255,0,0), serialInst, last_color)
+    #print('B_last_color:', last_color)
 
-    last_color = detect_and_label( mask_green, "Green", (0,255,0), serialInst, last_color, counter)    
-    print('G_last_color:', last_color)
+    last_color = detect_and_label( mask_green, "Green", (0,255,0), serialInst, last_color)    
+    #print('G_last_color:', last_color)
 
 
     # --- Show Windows ---
