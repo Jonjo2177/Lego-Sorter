@@ -24,11 +24,20 @@ serialInst.baudrate = 9600
 serialInst.port = use
 serialInst.open()
 
+def read_arduino():
+    if serialInst.in_waiting > 0:
+            line = serialInst.readline().decode('utf-8', errors='ignore').strip()
+            if line:
+                print(line)  # print what Arduino sends
+
 #commands for input
 while True:
+
     command = input("Arduino Command (Blue/Green/Red/exit): ")
     serialInst.write(command.encode('utf-8'))
+    read_arduino()
 
+                
     if command == "exit":
         exit()
 

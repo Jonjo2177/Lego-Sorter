@@ -26,6 +26,7 @@ for i in range(len(portsLists)):
 serialInst.baudrate = 9600
 serialInst.port = use
 serialInst.open()
+
 #-----------------------------------
 #       CV Lego Detection 
 #-----------------------------------
@@ -66,19 +67,48 @@ while True:
                 cv2.rectangle(frame, (x, y), (x+w, y+h), draw_color, 2)
                 cv2.putText(frame, color_name, (x, y-10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, draw_color, 2)
+            if last_color != color_name:
+                arduino_send(last_color, color_name)
+        
+        return last_color
+    
+    def arduino_send (last_color, color_name, x = 1):
+
+        while x < 2:
 
             if last_color != color_name:
                 serialInst.write((color_name + "\n").encode('utf-8'))
-                #print('color_name:', color_name)
+                print('color_name:', color_name)
                 last_color = color_name
-                #print('func_last_color:', last_color)
+                print('func_last_color:', last_color)
+                x = x + 1
+                print(x)
+            break
 
-                return last_color
+    def read_arduino(ser):
+        """
+        Non-blocking read: drains all available lines from the input buffer.
+        Prints any non-empty decoded lines.
+        """
+        # If nothing buffered yet, return quickly
+        if ser.in_waiting == 0:
+            return
+
+        # Read all available lines currently buffered
+        while ser.in_waiting > 0:
+            raw = ser.readline()  # respects ser.timeout; returns b'' if no full line
+            if not raw:
+                # No full line (no '\n') yet; stop to avoid busy loop
+                break
+            line = raw.decode('utf-8', errors='ignore').strip()
+            if line:
+                print(line)
+
 
     # --- Detect Each Color ---
 
     last_color = None
-    #print('1_last_color:', last_color)
+    print('1_last_color:', last_color)
     last_color = detect_and_label( mask_red, "Red", (0,0,255), serialInst, last_color)
     #print('R_last_color:', last_color)
 
@@ -87,6 +117,10 @@ while True:
 
     last_color = detect_and_label( mask_green, "Green", (0,255,0), serialInst, last_color)    
     #print('G_last_color:', last_color)
+
+    # Give the Arduino a brief moment to respond, then drain all replies.
+    time.sleep(0.05)
+    read_arduino(ser)
 
 
     # --- Show Windows ---

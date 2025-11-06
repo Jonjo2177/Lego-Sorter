@@ -86,15 +86,15 @@ while True:
 
     last_color = None
     counter = 0
-    print('1_last_color:', last_color)
+    #print('1_last_color:', last_color)
     last_color = detect_and_label( mask_red, "Red", (0,0,255), serialInst, last_color, counter)
-    print('R_last_color:', last_color)
+    #print('R_last_color:', last_color)
 
     last_color = detect_and_label( mask_blue, "Blue", (255,0,0), serialInst, last_color, counter)
-    print('B_last_color:', last_color)
+    #print('B_last_color:', last_color)
 
     last_color = detect_and_label( mask_green, "Green", (0,255,0), serialInst, last_color, counter)    
-    print('G_last_color:', last_color)
+    #print('G_last_color:', last_color)
 
 
     # --- Show Windows ---

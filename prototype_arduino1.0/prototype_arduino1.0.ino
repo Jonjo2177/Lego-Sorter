@@ -73,6 +73,7 @@ void loop() {
       delay(100);
       }
 
+      Serial.println("This is blue");
       //Sets Arms to BLUE BIN
       ARM.write(40);
       delay(100);
