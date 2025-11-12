@@ -95,7 +95,7 @@ def main():
 
     last_sent_color = None
     last_send_ts = 0.0
-    cooldown_ms = 300  # avoid spamming the Arduino
+    cooldown_ms = 10000  # avoid spamming the Arduino
 
     try:
         while True:
@@ -140,6 +140,7 @@ def main():
                 color_to_send = detections[0][0]
                 now = time.time() * 1000.0
                 if color_to_send != last_sent_color and (now - last_send_ts) >= cooldown_ms:
+                    print("it has been", now - last_send_ts, "seconds")
                     arduino_send(ser, color_to_send)
                     print(f"Sent: {color_to_send}")
                     last_sent_color = color_to_send

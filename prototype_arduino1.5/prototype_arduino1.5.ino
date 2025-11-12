@@ -9,7 +9,7 @@ bool newData = false;        // flag for new serial data
 
 #include <Servo.h>
 
-Servo ARM;
+Servo ARM1, ARM2;
 
 // Assign output pins (LEDs or motor control pins)
 const int redPin = 8;
@@ -27,8 +27,8 @@ void setup() {
   digitalWrite(greenPin, LOW);
   digitalWrite(bluePin, LOW);
 
-  ARM.attach(10);
-  ARM.write(90);  // set servo to mid-point
+  ARM1.attach(10);
+  ARM1.write(90);  // set servo to mid-point
 
   Serial.println("Arduino ready to receive color commands...");
 }
@@ -49,18 +49,25 @@ void loop() {
       if (Color.equalsIgnoreCase("Red")) {
         setColor(true, false, false);
         Serial.println("✅ New color detected: RED");
-        ARM.write(50);  // set servo to mid-point
+        ARM1.write(50);  // set servo to mid-point
+        delay(10000);
+        Serial.println("Red Brick is in Bin");
+
       } 
       else if (Color.equalsIgnoreCase("Green")) {
         setColor(false, true, false);
         Serial.println("✅ New color detected: GREEN");
-        ARM.write(80);  // set servo to mid-point
+        ARM1.write(80);  // set servo to mid-point
+        delay(10000);
+        Serial.println("Green Brick is in Bin");
 
       } 
       else if (Color.equalsIgnoreCase("Blue")) {
         setColor(false, false, true);
         Serial.println("✅ New color detected: BLUE");
-        ARM.write(20);  // set servo to mid-point
+        ARM1.write(20);  // set servo to mid-point
+        delay(10000);
+        Serial.println("Blue Brick is in Bin");
       } 
       else {
         Serial.println("⚠️ Unknown command: " + Color);
@@ -75,7 +82,7 @@ void receiveColorCommand() {
     char c = Serial.read();
     if (c == '\n') {          // End of command
       newData = true;
-      Serial.println(newData);
+      //Serial.println(newData);
       Color = incomingColor;
       Serial.println("Present" + Color);
 
@@ -86,7 +93,7 @@ void receiveColorCommand() {
 
     } else {
       incomingColor += c;     // Build the string one char at a time
-      Serial.println(incomingColor);
+      //Serial.println(incomingColor);
 
     }
   }
