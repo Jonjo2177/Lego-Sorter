@@ -13,8 +13,10 @@ struct StepperCfg {
 // Example: two motors. Add more entries as needed.
 const StepperCfg MOTOR_CFGS[] = {
   // dir, step, en,   usStart, usCruise, rampSteps, dirHigh
-  {4,    7,    10,    7000,    1200,     300,       false},  // M0
-  {13,    12,    11,    6000,    1500,     250,       true },  // M1
+  {4,    7,    0,    7000,    2000,     300,       false},  // M0
+  //{2,    3,    11,    6000,    8000,     250,       false }, //M1
+  {6,    5,    1,    6000,    4000,     250,       false }  // M2
+
 };
 const size_t N_MOTORS = sizeof(MOTOR_CFGS) / sizeof(MOTOR_CFGS[0]);
 
@@ -70,6 +72,9 @@ struct Stepper {
     nextDue   = micros();       // start now
   }
 
+  // Resume options:
+  // - withRAMP=true  : ramps up
+  // - hold=false : Straight to Full power
   void resume(bool withRamp) {
     holding = false;
     enableDriver();

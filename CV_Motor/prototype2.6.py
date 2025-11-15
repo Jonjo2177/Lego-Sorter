@@ -90,8 +90,9 @@ def main():
     upper_red2 = np.array([180, 255, 255])
     lower_blue = np.array([100, 150, 50])
     upper_blue = np.array([140, 255, 255])
-    lower_green = np.array([35,  40,  40])
-    upper_green = np.array([85,  255, 255])
+    lower_green = np.array([45, 100, 90])
+    upper_green = np.array([80, 255, 255])
+
 
     last_sent_color = None
     last_send_ts = 0.0
@@ -139,7 +140,8 @@ def main():
             if detections:
                 color_to_send = detections[0][0]
                 now = time.time() * 1000.0
-                if color_to_send != last_sent_color and (now - last_send_ts) >= cooldown_ms:
+                #if color_to_send != last_sent_color and (now - last_send_ts) >= cooldown_ms:
+                if (now - last_send_ts) >= cooldown_ms:
                     print("it has been", now - last_send_ts, "seconds")
                     arduino_send(ser, color_to_send)
                     print(f"Sent: {color_to_send}")
