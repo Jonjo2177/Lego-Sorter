@@ -34,9 +34,9 @@ struct StepperCfg {
 const StepperCfg MOTOR_CFGS[] = {
   // dir, step, en,   usStart, usCruise, rampSteps, dirHigh
   {4,    7,    0,    7000,    1500,     300,       false},  // M0
-  {2,    3,    11,    6000,    2000,     250,       false }, //M1
-  {6,    5,    1,    6000,    2000,     250,       true }  // M2
+  {6,    5,    1,    6000,    2000,     250,       true }  // M1
 };
+
 const size_t N_MOTORS = sizeof(MOTOR_CFGS) / sizeof(MOTOR_CFGS[0]);
 
 
@@ -170,8 +170,6 @@ bool newData = false;        // flag for new serial data
 //====================================
 
 
-
-
 #include <Servo.h>
 
 Servo ARM1, ARM2;
@@ -212,8 +210,9 @@ void setup() {
     motors[i].rampSteps = MOTOR_CFGS[i].rampSteps;
 
     motors[i].begin(MOTOR_CFGS[i].dirHigh);
-    motors[i].startWithRamp();   // strong launch for each motor
   }
+
+    motors[0].startWithRamp();   // start conveyor belt
 
   Serial.println("Arduino ready to receive color commands...");
 }
@@ -224,28 +223,14 @@ void loop() {
     motors[i].service();
   }
 
-  static unsigned long t0 = millis();
-  unsigned long t = millis() - t0;
-
-  if (t > 5000 && t < 5200) {
-    motors[0].stop(true);             // stop M0, hold torque
-    Serial.println("M0 paused (holding).");
-
-  }
-
-  if (t > 7000 && t < 7200) {
-    motors[0].resume(true);           // smooth ramp resume
-    Serial.println("M0 resumed with ramp.");
-  }
 
   receiveColorCommand(); // check for new serial data
 
-  if(newData == false)
-    motors[0].resume(false);          // instant resume at cruise
-    Serial.println("M0 resumed instantly.");
+  if(newData == false){
+
     motors[1].stop(true);             // stop M0, hold torque
     Serial.println("M0 paused (holding).");
-
+  }
 
   if (newData) {
     motors[0].stop(true);             // stop M0, hold torque
@@ -253,21 +238,13 @@ void loop() {
     newData = false;       // reset flag after reading
     Color.trim();  // remove newline or spaces
 
-    motors[1].startWithRamp();   // strong launch for each motor
-
     // Process only if the color has changed
     //if (Color != lastColor) {
       //lastColor = Color;  // update last known color
       //Serial.println("LastColor:" + lastColor);
 
-
+/*
       if (Color.equalsIgnoreCase("Red")) {
-
-        motors[0].resume(false);          // instant resume at cruise
-        Serial.println("M0 resumed instantly.");
-        delay(2000);
-        motors[0].stop(true);             // stop M0, hold torque
-        Serial.println("M0 paused (holding).");
 
         setColor(true, false, false);
         Serial.println("✅ New color detected: RED");
@@ -277,6 +254,10 @@ void loop() {
         delay(2000);
         motors[1].resume(true);           // smooth ramp resume
         Serial.println("M1 resumed with ramp.");
+
+        motors[0].resume(false);          // instant resume at cruise
+        Serial.println("M0 resumed instantly.");
+
         delay(10000);
         Serial.println("Red Brick is in Bin");
 
@@ -320,9 +301,9 @@ void loop() {
       } 
       else {
         Serial.println("⚠️ Unknown command: " + Color);
-      }
-    //}
-  }
+      }*/
+    }
+
 }
 
 // --- Function: Read color command from Serial ---
