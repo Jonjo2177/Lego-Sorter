@@ -175,7 +175,7 @@ const int SERVO2_RED_POS   = 40;
 const int SERVO1_GREEN_POS = 180;
 const int SERVO2_GREEN_POS = 120;
 
-const int SERVO1_BLUE_POS  = 40;
+const int SERVO1_BLUE_POS  = 50;
 const int SERVO2_BLUE_POS  = 180;
 
 // ======= SERIAL / PROTOCOL =======
@@ -242,7 +242,7 @@ void receiveColorCommand() {
       }
 
       // ---- SPEED COMMAND: "SPD1:<number>" ----
-      if (line.startsWith("SPD0:")) {
+      if (line.startsWith("SPD1:")) {
         String valStr = line.substring(5);  // part after "SPD:"
         unsigned long newUsCruise = valStr.toInt();
 
