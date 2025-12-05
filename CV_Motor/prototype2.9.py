@@ -7,6 +7,13 @@ import serial.tools.list_ports
 import matplotlib.pyplot as plt   # <-- NEW: for graph
 import matplotlib.ticker as ticker
 
+import requests
+from datetime import datetime
+
+API_URL = "https://your-edge-function.blink.new/api/brick-sorted"
+#API_URL = "https://lego-sorter-companion-app-45ib1hz3.sites.blink.new"
+
+
 plt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
 plt.gca().yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
 
@@ -14,6 +21,25 @@ plt.gca().yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
 count_red = 0
 count_green = 0
 count_blue = 0
+
+# ---------------------------
+# APP helpers
+# ---------------------------
+
+def send_brick_data(color, count=1):
+    payload = {
+        "color": color.lower(),
+        "count": count
+    }
+    
+    try:
+        response = requests.post(API_URL, json=payload, timeout=5)
+        if response.status_code == 200:
+            print(f"✓ Sent {count} {color} brick(s)")
+        else:
+            print(f"✗ Error: {response.status_code}")
+    except Exception as e:
+        print(f"✗ Failed to send: {e}")
 
 
 # ---------------------------
@@ -56,6 +82,8 @@ def read_arduino(ser):
 def arduino_send(ser, color_name):
     """Send a single line to Arduino."""
     to_send = (color_name + "\n").encode("utf-8")
+    send_brick_data(color_name)
+    time.sleep(0.1)  # Debounce
     ser.write(to_send)
     ser.flush()
 
@@ -82,7 +110,7 @@ def draw_box_and_label(frame, cnt, label, bgr_color):
 # Main
 # ---------------------------
 def main():
-    global count_red, count_green, count_blue   # <-- modifying the globals
+    global count_red, count_green, count_blue   # <-- we'll modify the globals
 
     # ---- Serial setup ----
     port = choose_port()
@@ -111,7 +139,7 @@ def main():
 
     # ---- Video setup ----
     cap = cv2.VideoCapture(0)  # webcam
-    #cap = cv2.VideoCapture('Green Piece.mov')  # demo file
+    #cap = cv2.VideoCapture('Green Piece.mov')  # file
 
     if not cap.isOpened():
         print("Error: could not open video source.")
